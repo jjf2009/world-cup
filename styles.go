@@ -148,7 +148,7 @@ func NewStyles(r *lipgloss.Renderer) Styles {
 			Foreground(colorGold),
 
 		loading: r.NewStyle().
-			Foreground(colorSienna).
-			Faint(true),
+			Foreground(colorInk).
+			Faint(false),
 	}
 }

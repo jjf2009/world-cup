@@ -1,6 +1,8 @@
 package main
 
 import (
+	"time"
+
 	"github.com/charmbracelet/bubbles/table"
 	tea "github.com/charmbracelet/bubbletea"
 
@@ -38,6 +40,7 @@ type Model struct {
 	// contains the loading state of each view, to be used in view.go
 	loadingMap        map[int]bool
 	showLoadingCursor bool
+	lastUpdated       time.Time
 
 	// pty dimensions for rendering
 	width  int
@@ -71,6 +74,7 @@ func fetchCmd[T any](fetcher func() (T, error)) tea.Cmd {
 func (m Model) Init() tea.Cmd {
 	return tea.Batch(
 		tickCmd(),
+		refreshTickCmd(),
 		fetchCmd[cmd.MatchScoresResponse](cmd.GetMatchScores),
 		fetchCmd[cmd.MatchScheduleResponse](cmd.GetMatchSchedule),
 		fetchCmd[cmd.PointsTableResponse](cmd.GetPointsTable),
@@ -124,5 +128,6 @@ func NewModel(renderer *lipgloss.Renderer) Model {
 		selectedTab:      LiveView,
 		matchTable:       t,
 		matchTableStyles: ts,
+		lastUpdated:      time.Now(),
 	}
 }

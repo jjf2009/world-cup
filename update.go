@@ -82,6 +82,16 @@ func (m Model) allLoaded() bool {
 		!m.loadingMap[LiveView]
 }
 
+type refreshtickMsg time.Time
+
+func refreshTickCmd() tea.Cmd {
+
+	// refresh scores every 10 seconds
+	return tea.Tick(10*time.Second, func(t time.Time) tea.Msg {
+		return refreshtickMsg(t)
+	})
+}
+
 type tickMsg time.Time
 
 func tickCmd() tea.Cmd {
@@ -138,6 +148,16 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			return m, tickCmd()
 		}
 		return m, nil
+
+	case refreshtickMsg:
+		var err error
+		m.items.liveMatch, err = cmd.GetLiveMatchScores()
+		if err != nil {
+			// dont update anything
+			return m, nil
+		}
+		m.lastUpdated = time.Now()
+		return m, refreshTickCmd()
 
 	case tea.KeyMsg:
 		key := msg.String()

@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"sort"
 	"strings"
+	"time"
 
 	"github.com/charmbracelet/lipgloss"
 	"github.com/h0i5/ipl/cmd"
@@ -35,16 +36,23 @@ func clamp(v, lo, hi int) int {
 func (m Model) View() string {
 	var cursor string
 	if m.showLoadingCursor {
-		cursor = "█"
+		cursor = m.styles.cursorStyle.Render("█")
 	} else {
 		cursor = " "
 	}
+
 	if m.currentView == InitialLoadView {
+		content := lipgloss.JoinHorizontal(
+			lipgloss.Center,
+			"Loading IPL 2026 ",
+			cursor,
+		)
+
 		return m.styles.loading.
 			Width(m.width).
 			Height(m.height).
 			Align(lipgloss.Center, lipgloss.Center).
-			Render("Loading IPL 2026" + cursor)
+			Render(content)
 	}
 
 	// Cap the total UI size so it doesn't sprawl on huge terminals
@@ -263,9 +271,14 @@ func (m Model) renderLive(width int) string {
 	sb.WriteString(heading.Render("live matches"))
 	sb.WriteString("\n\n")
 
+	loc, _ := time.LoadLocation("Asia/Kolkata")
+
 	data := m.items.liveMatch
 	if data.LiveCount == 0 || len(data.Matches) == 0 {
-		sb.WriteString(s.muted.Render("No matches live right now."))
+		sb.WriteString(s.muted.Render("No matches live right now •"))
+		sb.WriteString(s.faint.Render(
+			" last updated " + m.lastUpdated.In(loc).Format("15:04:05"),
+		))
 		sb.WriteString("\n")
 		sb.WriteString(s.faint.Render("Press [m] for historical view."))
 		return sb.String()
@@ -287,6 +300,10 @@ func (m Model) renderLive(width int) string {
 
 		badge := s.liveDot.Render("● LIVE")
 		title := s.gold.Bold(true).Render(match.Title)
+
+		sb.WriteString(s.faint.Render(
+			" last updated " + m.lastUpdated.In(loc).Format("15:04:05"),
+		))
 
 		team1 := s.teamName.Render(match.Team1)
 		score1 := s.score.Render(match.Score1)
