@@ -1,0 +1,11 @@
+services:
+  ssh-app:
+    build: .
+    ports:
+      - "22:6767"
+    volumes:
+      - ./term_info_ed25519:/app/.ssh/term_info_ed25519
+      - ./logs:/app/logs
+    restart: unless-stopped
+    env_file:
+      - .env
