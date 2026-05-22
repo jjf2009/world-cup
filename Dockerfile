@@ -6,7 +6,7 @@ COPY . .
 RUN go build -o server .
 
 FROM alpine:latest
-RUN apk add --no-cache openssh-keygen
+RUN apk add --no-cache openssh-keygen tzdata
 WORKDIR /app
 COPY --from=builder /app/server .
 RUN mkdir -p .ssh
