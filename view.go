@@ -763,7 +763,10 @@ func (m Model) renderAbout(width int) string {
 		),
 
 		"",
-		s.faint.Render("built with bubbletea"),
+		lipgloss.JoinHorizontal(lipgloss.Left,
+			s.faint.Render("built with bubbletea • code @ "),
+			s.highlight.Render("https://github.com/h0i5/ipl"),
+		),
 		"",
 	}
 
