@@ -100,17 +100,19 @@ func NewModel(renderer *lipgloss.Renderer) Model {
 		table.WithHeight(20),
 	)
 
-	ts := table.DefaultStyles()
-	ts.Header = ts.Header.
-		BorderStyle(lipgloss.NormalBorder()).
-		BorderForeground(colorRule).
-		BorderBottom(true).
-		Foreground(colorGold).
-		Bold(true)
-	ts.Selected = ts.Selected.
-		Foreground(colorInk).
-		Background(colorSienna).
-		Bold(true)
+	ts := table.Styles{
+		Header: renderer.NewStyle().
+			BorderStyle(lipgloss.NormalBorder()).
+			BorderForeground(colorRule).
+			BorderBottom(true).
+			Foreground(colorGold).
+			Bold(true),
+		Selected: renderer.NewStyle().
+			Foreground(colorInk).
+			Background(colorSienna).
+			Bold(true),
+		Cell: renderer.NewStyle().Padding(0, 1),
+	}
 	t.SetStyles(ts)
 
 	loadingMap := map[int]bool{
