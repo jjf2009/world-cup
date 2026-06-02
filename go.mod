@@ -1,6 +1,6 @@
 module github.com/h0i5/ipl
 
-go 1.26.2
+go 1.25.2
 
 require (
 	github.com/charmbracelet/bubbles v1.0.0

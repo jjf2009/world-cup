@@ -1,189 +1,152 @@
 package cmd
 
+// ========================================
+// Match Results
+// ========================================
+
 type MatchScoresResponse struct {
-	StatusCode  int              `json:"status_code"`
-	Season      string           `json:"season"`
-	Source      string           `json:"source"`
-	Status      string           `json:"status"`
-	LiveCount   int              `json:"live_count"`
-	LiveScore   map[string]Match `json:"live_score"`
-	Matches     map[string]Match `json:"matches"`
-	DateChecked string           `json:"date_checked"`
+	StatusCode int              `json:"status_code"`
+	Matches    map[string]Match `json:"matches"`
+	LastUpdated string          `json:"last_updated"`
 }
 
 type Match struct {
-	Status       string `json:"status"`
-	Description  string `json:"description"`
-	Type         string `json:"type"`
-	Venue        string `json:"venue"`
-	Date         string `json:"date"`
-	StartTimeUTC string `json:"start_time_utc"`
-	Team1        string `json:"team_1"`
-	Score1       string `json:"score_1"`
-	Team2        string `json:"team_2"`
-	Score2       string `json:"score_2"`
-	Result       string `json:"result,omitempty"`
+	ID string `json:"id"`
+
+	MatchNumber string `json:"match_number"`
+
+	Status string `json:"status"`
+
+	HomeTeam string `json:"home_team"`
+	AwayTeam string `json:"away_team"`
+
+	HomeScore int `json:"home_score"`
+	AwayScore int `json:"away_score"`
+
+	Venue string `json:"venue"`
+
+	Date string `json:"date"`
+
+	Result string `json:"result,omitempty"`
 }
 
-type MatchScheduleResponse struct {
-	StatusCode int                       `json:"status_code"`
-	Season     string                    `json:"season"`
-	Schedule   map[string]ScheduledMatch `json:"schedule"`
-}
+// ========================================
+// Live Matches
+// ========================================
 
-type ScheduledMatch struct {
-	Rival    string `json:"Rival"`
-	Location string `json:"Location"`
-	Date     string `json:"Date"`
-	Time     string `json:"Time"`
-}
+type LiveMatchResponse struct {
+	StatusCode int `json:"status_code"`
 
-type PointsTableResponse struct {
-	StatusCode  int                     `json:"status_code"`
-	Season      string                  `json:"season"`
-	PointsTable map[string]TeamStanding `json:"points_table"`
-}
+	LiveCount int `json:"live_count"`
 
-type TeamStanding struct {
-	Name       string  `json:"Name"`
-	Played     int     `json:"Played"`
-	Won        int     `json:"Won"`
-	Loss       int     `json:"Loss"`
-	NoResult   int     `json:"No Result"`
-	NetRunRate float64 `json:"Net Run Rate"`
-	Points     int     `json:"Points"`
-}
+	Matches map[string]LiveMatch `json:"matches"`
 
-type HistoricalWinnersResponse struct {
-	StatusCode int                   `json:"status_code"`
-	Winners    map[string]YearWinner `json:"winners"`
-}
-
-type YearWinner struct {
-	Winner   string `json:"Winner"`
-	WonBy    string `json:"Won By"`
-	RunnerUp string `json:"Runner Up"`
-	Venue    string `json:"Venue"`
+	LastUpdated string `json:"last_updated"`
 }
 
 type LiveMatch struct {
-	Status      string       `json:"status"`
-	Team1       string       `json:"team_1"`
-	Score1      string       `json:"score_1"`
-	Overs1      string       `json:"overs_1"`
-	Team2       string       `json:"team_2"`
-	Score2      string       `json:"score_2"`
-	Overs2      string       `json:"overs_2"`
-	MatchURL    string       `json:"match_url"`
-	StartTime   string       `json:"start_time,omitempty"`
-	LiveDetails *LiveDetails `json:"live_details,omitempty"`
+	ID string `json:"id"`
+
+	MatchNumber string `json:"match_number"`
+
+	Status string `json:"status"`
+
+	HomeTeam string `json:"home_team"`
+	AwayTeam string `json:"away_team"`
+
+	HomeScore int `json:"home_score"`
+	AwayScore int `json:"away_score"`
+
+	Minute string `json:"minute"`
+
+	Venue string `json:"venue"`
 }
 
-type LiveDetails struct {
-	StatusText   string      `json:"status_text"`
-	Inning       int         `json:"inning"`
-	Toss         string      `json:"toss"`
-	Venue        string      `json:"venue"`
-	MatchNumber  string      `json:"match_number"`
-	StartTimeISO string      `json:"start_time_iso"`
-	Team1Full    string      `json:"team_1_full"`
-	Team2Full    string      `json:"team_2_full"`
-	Batters      []Batter    `json:"batters"`
-	Bowler       Bowler      `json:"bowler"`
-	Rates        LiveRates   `json:"rates"`
-	Partnership  Partnership `json:"partnership"`
-	LastWicket   LastWicket  `json:"last_wicket"`
-	RecentOvers  []RecentOver `json:"recent_overs"`
+// ========================================
+// Schedule
+// ========================================
+
+type MatchScheduleResponse struct {
+	StatusCode int `json:"status_code"`
+
+	Schedule map[string]ScheduledMatch `json:"schedule"`
 }
 
-type Batter struct {
-	Name       string `json:"name"`
-	FullName   string `json:"full_name"`
-	Runs       string `json:"runs"`
-	Balls      string `json:"balls"`
-	Fours      string `json:"fours"`
-	Sixes      string `json:"sixes"`
-	StrikeRate string `json:"strike_rate"`
-	OnStrike   bool   `json:"on_strike"`
+type ScheduledMatch struct {
+	MatchNumber string `json:"match_number"`
+
+	HomeTeam string `json:"home_team"`
+	AwayTeam string `json:"away_team"`
+
+	Venue string `json:"venue"`
+
+	Date string `json:"date"`
+	Time string `json:"time"`
 }
 
-type Bowler struct {
-	Name     string `json:"name"`
-	FullName string `json:"full_name"`
-	Figures  string `json:"figures"`
-	Overs    string `json:"overs"`
-	Economy  string `json:"economy"`
+// ========================================
+// Points Table
+// ========================================
+
+type PointsTableResponse struct {
+	StatusCode int `json:"status_code"`
+
+	Standings map[string]TeamStanding `json:"standings"`
 }
 
-type LiveRates struct {
-	CRR string `json:"crr"`
-	RRR string `json:"rrr"`
+type TeamStanding struct {
+	Position int `json:"position"`
+
+	Team string `json:"team"`
+
+	Played int `json:"played"`
+	Won    int `json:"won"`
+	Drawn  int `json:"drawn"`
+	Lost   int `json:"lost"`
+
+	GoalsFor        int `json:"goals_for"`
+	GoalsAgainst    int `json:"goals_against"`
+	GoalDifference  int `json:"goal_difference"`
+
+	Points int `json:"points"`
 }
 
-type Partnership struct {
-	Runs  int `json:"runs"`
-	Balls int `json:"balls"`
+// ========================================
+// Historical Winners
+// ========================================
+
+type HistoricalWinnersResponse struct {
+	StatusCode int `json:"status_code"`
+
+	Winners map[string]YearWinner `json:"winners"`
 }
 
-type LastWicket struct {
-	Name  string `json:"name"`
-	Runs  string `json:"runs"`
-	Balls string `json:"balls"`
+type YearWinner struct {
+	Winner string `json:"winner"`
+
+	RunnerUp string `json:"runner_up"`
+
+	Venue string `json:"venue"`
 }
 
-type RecentOver struct {
-	Over     string   `json:"over"`
-	OverInfo []string `json:"overinfo"`
-	Total    int      `json:"total"`
-}
+// ========================================
+// Squads
+// ========================================
 
-type LiveMatchResponse struct {
-	StatusCode  int                  `json:"status_code"`
-	Season      string               `json:"season"`
-	Source      string               `json:"source"`
-	Status      string               `json:"status"`
-	LiveCount   int                  `json:"live_count"`
-	LiveScore   map[string]LiveMatch `json:"live_score"`
-	Matches     map[string]LiveMatch `json:"matches"`
-	DateChecked string               `json:"date_checked"`
+type SquadResponse struct {
+	StatusCode int `json:"status_code"`
+
+	Team string `json:"team"`
+
+	Squad map[string]SquadPlayer `json:"squad"`
 }
 
 type SquadPlayer struct {
-	Name         string `json:"Name"`
-	Nationality  string `json:"Nationality"`
-	Role         string `json:"Role"`
-	Style        string `json:"Style"`
-	Wicketkeeper bool   `json:"Wicketkeeper"`
-	Overseas     bool   `json:"Overseas"`
-}
+	Name string `json:"name"`
 
-type SquadResponse struct {
-	StatusCode int                    `json:"status_code"`
-	Team       string                 `json:"team"`
-	Season     string                 `json:"season"`
-	Squad      map[string]SquadPlayer `json:"squad"`
-}
+	Nationality string `json:"nationality"`
 
-//type LiveMatchResponse struct {
-//	StatusCode  int                    `json:"status_code"`
-//	Season      string                 `json:"season"`
-//	Source      string                 `json:"source"`
-//	SeriesID    string                 `json:"series_id,omitempty"`
-//	Status      string                 `json:"status"`
-//	LiveCount   int                    `json:"live_count"`
-//	LiveScore   map[string]interface{} `json:"live_score,omitempty"`
-//	Matches     map[string]LiveMatch   `json:"matches"`
-//	DateChecked string                 `json:"date_checked,omitempty"`
-//}
-//
-//type LiveMatch struct {
-//	Status     string `json:"status"`
-//	Title      string `json:"title"`
-//	Info       string `json:"info,omitempty"`
-//	Team1      string `json:"team_1"`
-//	Score1     string `json:"score_1"`
-//	Team2      string `json:"team_2"`
-//	Score2     string `json:"score_2"`
-//	MatchURL   string `json:"match_url,omitempty"`
-//	StatusText string `json:"status_text"`
-//}
+	Position string `json:"position"`
+
+	JerseyNumber int `json:"jersey_number"`
+}
