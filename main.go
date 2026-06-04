@@ -40,6 +40,9 @@ func myLoggingMiddleware() wish.Middleware {
 func main() {
 	godotenv.Load()
 
+	// Ensure logs directory exists
+	_ = os.MkdirAll("logs", 0755)
+
 	// log to a file
 	logFile, _ := os.OpenFile("logs/server.log", os.O_CREATE|os.O_APPEND|os.O_WRONLY, 0644)
 	multi := io.MultiWriter(os.Stdout, logFile)

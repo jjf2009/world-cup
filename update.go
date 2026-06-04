@@ -10,13 +10,14 @@ func (m Model) handleTabNavigation(key string) (tea.Model, tea.Cmd) {
 	switch key {
 	case "l":
 		m.selectedTab = LiveView
-
 	case "m":
 		m.selectedTab = MatchView
-
+	case "p":
+		m.selectedTab = PointsTableView
 	case "s":
-		m.selectedTab = StandingsView
-
+		m.selectedTab = ScheduleView
+	case "h":
+		m.selectedTab = HistoricalView
 	case "a":
 		m.selectedTab = AboutView
 	}
@@ -87,13 +88,29 @@ func tickCmd() tea.Cmd {
 	)
 }
 
+type liveTickMsg time.Time
+
+func liveTickCmd() tea.Cmd {
+	return tea.Tick(
+		1000*time.Millisecond,
+		func(t time.Time) tea.Msg {
+			return liveTickMsg(t)
+		},
+	)
+}
+
 func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
+	var cmds []tea.Cmd
 
 	switch msg := msg.(type) {
 
 	case tickMsg:
 		m.showLoadingCursor = !m.showLoadingCursor
 		return m, tickCmd()
+
+	case liveTickMsg:
+		m.showLiveCursor = !m.showLiveCursor
+		return m, liveTickCmd()
 
 	case tea.KeyMsg:
 		key := msg.String()
@@ -103,16 +120,25 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		}
 
 		switch key {
-		case "l", "m", "s", "a":
+		case "l", "m", "p", "s", "h", "a":
 			return m.handleTabNavigation(key)
 		}
 
 		switch m.currentView {
 
-		case MatchView, StandingsView, AboutView, LiveView:
+		case LiveView, PointsTableView, ScheduleView, HistoricalView, AboutView:
 			if key == "left" {
 				return m.handleNavToTabView()
 			}
+
+		case MatchView:
+			if key == "left" {
+				return m.handleNavToTabView()
+			}
+			// Forward keyboard events to the table to allow scrolling
+			var cmd tea.Cmd
+			m.matchTable, cmd = m.matchTable.Update(msg)
+			return m, cmd
 
 		case TabView:
 			return m.handleTabCursor(key)
@@ -132,5 +158,5 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		}
 	}
 
-	return m, nil
+	return m, tea.Batch(cmds...)
 }

@@ -1,0 +1,16 @@
+2026/06/04 06:15:27 Starting SSH server on 0.0.0.0:6767
+2026/06/04 06:15:39 INFO connect ip=[::1]:51198 user=jjf2009
+2026/06/04 06:15:44 INFO disconnect ip=[::1]:51198 user=jjf2009 duration=4.781287667s
+2026/06/04 06:16:26 Starting SSH server on 0.0.0.0:6767
+2026/06/04 06:16:31 INFO connect ip=[::1]:34142 user=jjf2009
+2026/06/04 06:16:36 INFO disconnect ip=[::1]:34142 user=jjf2009 duration=4.787632125s
+2026/06/04 06:16:59 Starting SSH server on 0.0.0.0:6767
+2026/06/04 06:17:03 INFO connect ip=[::1]:35732 user=jjf2009
+2026/06/04 06:17:07 INFO disconnect ip=[::1]:35732 user=jjf2009 duration=4.785802411s
+2026/06/04 06:18:38 Starting SSH server on 0.0.0.0:6767
+2026/06/04 06:19:10 INFO connect ip=[::1]:54646 user=jjf2009
+2026/06/04 06:19:39 INFO disconnect ip=[::1]:54646 user=jjf2009 duration=28.300773794s
+2026/06/04 06:22:36 Shutting down...
+2026/06/04 06:23:35 Starting SSH server on 0.0.0.0:6767
+2026/06/04 06:23:38 INFO connect ip=[::1]:47574 user=jjf2009
+2026/06/04 06:23:43 INFO disconnect ip=[::1]:47574 user=jjf2009 duration=4.777899288s

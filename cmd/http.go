@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"net/http"
 	"os"
+	"strings"
 )
 
 func GetApiData[T any](route string) (T, error) {
@@ -63,4 +64,8 @@ func GetMatchSchedule() (MatchScheduleResponse, error) {
 
 func GetHistoricalWinners() (HistoricalWinnersResponse, error) {
 	return GetApiData[HistoricalWinnersResponse]("history")
+}
+
+func TeamToSlug(name string) string {
+	return strings.ToLower(strings.ReplaceAll(name, " ", "-"))
 }

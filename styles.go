@@ -98,8 +98,7 @@ func NewStyles(r *lipgloss.Renderer) Styles {
 		// Match card
 		teamName: r.NewStyle().
 			Foreground(colorGold).
-			Bold(true).
-			Width(6),
+			Bold(true),
 
 		score: r.NewStyle().
 			Foreground(colorInk).
