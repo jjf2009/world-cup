@@ -8,6 +8,7 @@ import (
 
 	"github.com/charmbracelet/lipgloss"
 	"github.com/h0i5/ipl/cmd"
+	"github.com/h0i5/ipl/internal/domain"
 )
 
 var tabLabels = map[int]struct{ key, label string }{
@@ -212,9 +213,8 @@ func (m Model) renderLive(width int) string {
 		lastUpdated = m.lastUpdated.In(loc).Format("15:04:05")
 	}
 
-	data := m.items.liveMatch
-
-	if data.LiveCount <= 0 || len(data.Matches) == 0 {
+	match := m.items.liveMatch
+	if match.ID == "" {
 		sb.WriteString(s.muted.Render("No matches live right now"))
 		sb.WriteString("\n")
 		sb.WriteString(s.faint.Render("Waiting for live match data..."))
@@ -222,96 +222,113 @@ func (m Model) renderLive(width int) string {
 	}
 
 	updatedLine := s.faint.Render(
-		"last updated " + lastUpdated + " • auto updates every 5s",
+		"last updated " + lastUpdated + " • auto updates every 1s",
 	)
 	sb.WriteString(updatedLine)
 	sb.WriteString("\n\n")
 
-	keys := make([]string, 0, len(data.Matches))
-	for k := range data.Matches {
-		keys = append(keys, k)
+	dot := "●"
+	if !m.showLiveCursor {
+		dot = " "
 	}
-	sort.Strings(keys)
+	badge := s.liveDot.Render(dot + " " + match.Status)
+	if match.Minute > 0 {
+		badge = lipgloss.JoinHorizontal(lipgloss.Left,
+			badge,
+			s.faint.Render(fmt.Sprintf("  •  %d'", match.Minute)),
+		)
+	}
+	sb.WriteString(badge + "\n\n")
 
-	renderedMatches := 0
-	for _, k := range keys {
-		match := data.Matches[k]
+	homeTeam := s.teamName.Render(truncate(match.HomeTeam, 24))
+	awayTeam := s.teamName.Render(truncate(match.AwayTeam, 24))
+	homeScore := s.score.Render(fmt.Sprintf("%d", match.HomeScore))
+	awayScore := s.score.Render(fmt.Sprintf("%d", match.AwayScore))
 
-		if match.HomeTeam == "" && match.AwayTeam == "" {
-			continue
+	hArt := teamArt(match.HomeTeam)
+	aArt := teamArt(match.AwayTeam)
+	sLine := fmt.Sprintf("%d-%d", match.HomeScore, match.AwayScore)
+	sArt := scoreArt(sLine)
+
+	if hArt != "" && aArt != "" && sArt != "" && width >= 72 {
+		// Count lines in each art block so we can vertically center the
+		// score (which is much shorter) relative to the team banners.
+		hLines := strings.Count(hArt, "\n")
+		aLines := strings.Count(aArt, "\n")
+		sLines := strings.Count(sArt, "\n")
+		tallest := hLines
+		if aLines > tallest {
+			tallest = aLines
 		}
-		renderedMatches++
-
-		// Live badge with minute
-		dot := "●"
-		if !m.showLiveCursor {
-			dot = " "
+		scorePad := (tallest - sLines) / 2
+		if scorePad < 0 {
+			scorePad = 0
 		}
-		badge := s.liveDot.Render(dot + " LIVE")
-		if match.Minute != "" {
-			badge = lipgloss.JoinHorizontal(lipgloss.Left,
-				badge,
-				s.faint.Render(fmt.Sprintf("  •  %s'", match.Minute)),
-			)
-		}
-		sb.WriteString(badge + "\n\n")
+		scorePadStr := strings.Repeat("\n", scorePad)
 
-		// Score display
-		homeTeam := s.teamName.Render(truncate(match.HomeTeam, 24))
-		awayTeam := s.teamName.Render(truncate(match.AwayTeam, 24))
-		homeScore := s.score.Render(fmt.Sprintf("%d", match.HomeScore))
-		awayScore := s.score.Render(fmt.Sprintf("%d", match.AwayScore))
+		homeArtStyled := lipgloss.NewStyle().Foreground(lipgloss.Color("166")).Render(hArt)
+		scoreStyled := lipgloss.NewStyle().Foreground(lipgloss.Color("229")).Padding(0, 3).Render(scorePadStr + sArt)
+		awayArtStyled := lipgloss.NewStyle().Foreground(lipgloss.Color("166")).Render(aArt)
 
-		hArt := teamArt(match.HomeTeam)
-		aArt := teamArt(match.AwayTeam)
-		sLine := fmt.Sprintf("%d-%d", match.HomeScore, match.AwayScore)
-		sArt := scoreArt(sLine)
+		banner := lipgloss.JoinHorizontal(lipgloss.Top, homeArtStyled, scoreStyled, awayArtStyled)
+		sb.WriteString(lipgloss.NewStyle().Width(width).Align(lipgloss.Center).Render(banner))
+		sb.WriteString("\n")
 
-		if hArt != "" && aArt != "" && sArt != "" && width >= 72 {
-			banner := lipgloss.JoinHorizontal(
-				lipgloss.Top,
-				lipgloss.NewStyle().Foreground(lipgloss.Color("166")).Render(hArt),
-				lipgloss.NewStyle().Margin(2, 4, 0, 4).Foreground(lipgloss.Color("229")).Render(sArt),
-				lipgloss.NewStyle().Foreground(lipgloss.Color("166")).Render(aArt),
-			)
-			sb.WriteString(lipgloss.NewStyle().Width(width).Align(lipgloss.Center).Render(banner))
-			sb.WriteString("\n\n")
-		} else if width >= 80 {
-			colW := width / 3
-			midW := width - 2*colW
-
-			scoreLine := fmt.Sprintf("%s  –  %s", homeScore, awayScore)
-
-			leftCol := lipgloss.NewStyle().Width(colW).Align(lipgloss.Right).Render(homeTeam)
-			midCol := lipgloss.NewStyle().Width(midW).Align(lipgloss.Center).Render(scoreLine)
-			rightCol := lipgloss.NewStyle().Width(colW).Align(lipgloss.Left).Render(awayTeam)
-
-			sb.WriteString(lipgloss.JoinHorizontal(lipgloss.Top, leftCol, midCol, rightCol))
-			sb.WriteString("\n")
-		} else {
-			// narrow fallback
-			row1 := lipgloss.JoinHorizontal(lipgloss.Left, homeTeam, "  ", homeScore)
-			row2 := lipgloss.JoinHorizontal(lipgloss.Left, awayTeam, "  ", awayScore)
-			narrowW := width - 6
-			if narrowW > 60 {
-				narrowW = 60
-			}
-			sb.WriteString(s.matchCard.Width(narrowW).Render(strings.Join([]string{"", row1, row2}, "\n")))
-		}
-
-		if match.Venue != "" {
-			sb.WriteString(s.venue.Render("📍 " + match.Venue) + "\n")
-		}
-
-		if match.MatchNumber != "" {
-			sb.WriteString(s.faint.Render("Match "+match.MatchNumber) + "\n")
-		}
-
+		// Label row under the banner so it is always clear which team is which
+		homeLabelW := lipgloss.Width(homeArtStyled)
+		scoreW := lipgloss.Width(scoreStyled)
+		awayLabelW := lipgloss.Width(awayArtStyled)
+		homeLabel := lipgloss.NewStyle().Width(homeLabelW).Align(lipgloss.Center).
+			Render(s.teamName.Render(truncate(match.HomeTeam, 24)))
+		scoreSpacer := lipgloss.NewStyle().Width(scoreW).Render("")
+		awayLabel := lipgloss.NewStyle().Width(awayLabelW).Align(lipgloss.Center).
+			Render(s.teamName.Render(truncate(match.AwayTeam, 24)))
+		labelRow := lipgloss.JoinHorizontal(lipgloss.Top, homeLabel, scoreSpacer, awayLabel)
+		sb.WriteString(lipgloss.NewStyle().Width(width).Align(lipgloss.Center).Render(labelRow))
 		sb.WriteString("\n\n")
+	} else if width >= 80 {
+		colW := width / 3
+		midW := width - 2*colW
+
+		scoreLine := fmt.Sprintf("%s  -  %s", homeScore, awayScore)
+
+		leftCol := lipgloss.NewStyle().Width(colW).Align(lipgloss.Right).Render(homeTeam)
+		midCol := lipgloss.NewStyle().Width(midW).Align(lipgloss.Center).Render(scoreLine)
+		rightCol := lipgloss.NewStyle().Width(colW).Align(lipgloss.Left).Render(awayTeam)
+
+		sb.WriteString(lipgloss.JoinHorizontal(lipgloss.Top, leftCol, midCol, rightCol))
+		sb.WriteString("\n")
+	} else {
+		row1 := lipgloss.JoinHorizontal(lipgloss.Left, homeTeam, "  ", homeScore)
+		row2 := lipgloss.JoinHorizontal(lipgloss.Left, awayTeam, "  ", awayScore)
+		narrowW := width - 6
+		if narrowW > 60 {
+			narrowW = 60
+		}
+		sb.WriteString(s.matchCard.Width(narrowW).Render(strings.Join([]string{"", row1, row2}, "\n")))
 	}
 
-	if renderedMatches == 0 {
-		sb.WriteString(s.muted.Render("No valid live match data available"))
+	if match.Venue != "" {
+		sb.WriteString(s.venue.Render("Venue: "+match.Venue) + "\n")
+	}
+	if match.Group != "" {
+		sb.WriteString(s.faint.Render("Group "+match.Group) + "\n")
+	}
+	if match.MatchNumber != "" {
+		sb.WriteString(s.faint.Render("Match "+match.MatchNumber) + "\n")
+	}
+	if len(match.Scorers) > 0 {
+		sb.WriteString("\n")
+		sb.WriteString(s.tableHeader.Render("scorers"))
+		sb.WriteString("\n")
+		for _, scorer := range match.Scorers {
+			minute := ""
+			if scorer.Minute > 0 {
+				minute = fmt.Sprintf(" %d'", scorer.Minute)
+			}
+			sb.WriteString(s.muted.Render(fmt.Sprintf("%s%s - %s", scorer.Name, minute, scorer.Team)))
+			sb.WriteString("\n")
+		}
 	}
 
 	return sb.String()
@@ -356,7 +373,7 @@ func (m Model) renderMatches(width int) string {
 	return sb.String()
 }
 
-func (m Model) renderMatchCard(match cmd.Match, width int, live bool) string {
+func (m Model) renderMatchCard(match domain.MatchView, width int, live bool) string {
 	s := m.styles
 
 	var badge string
@@ -418,6 +435,63 @@ func (m Model) renderMatchCard(match cmd.Match, width int, live bool) string {
 
 // ── Standings ─────────────────────────────────────────────────────────────────
 
+// buildStandingsContent builds the raw standings text used both by
+// renderStandings (for the viewport) and by the resize handler in Update.
+func (m Model) buildStandingsContent(width int) string {
+	s := m.styles
+
+	var sb strings.Builder
+
+	// Header row — football columns: P W D L GF GA GD Pts
+	header := fmt.Sprintf("%-3s %-28s %3s %3s %3s %3s %3s %3s %4s %4s",
+		"#", "Team", "P", "W", "D", "L", "GF", "GA", "GD", "Pts",
+	)
+	sb.WriteString(s.tableHeader.Render(header))
+	sb.WriteString("\n")
+	sb.WriteString(s.faint.Render(strings.Repeat("─", width)))
+	sb.WriteString("\n")
+
+	lastGroup := ""
+	groupRow := 0
+	for i, team := range m.items.standings {
+		if team.Group != lastGroup {
+			if i > 0 {
+				sb.WriteString("\n")
+			}
+			sb.WriteString(s.gold.Render("Group " + team.Group))
+			sb.WriteString("\n")
+			lastGroup = team.Group
+			groupRow = 0
+		}
+		groupRow++
+
+		row := fmt.Sprintf("%-3d %-28s %3d %3d %3d %3d %3d %3d %+4d %4d",
+			team.Position,
+			truncate(team.Team, 27),
+			team.Played,
+			team.Won,
+			team.Drawn,
+			team.Lost,
+			team.GoalsFor,
+			team.GoalsAgainst,
+			team.GoalDifference,
+			team.Points,
+		)
+
+		if groupRow <= 2 {
+			sb.WriteString(s.tableRow.Render(row))
+		} else {
+			sb.WriteString(s.tableRowAlt.Render(row))
+		}
+		sb.WriteString("\n")
+	}
+
+	sb.WriteString("\n")
+	sb.WriteString(s.faint.Render("top teams advance from group stage"))
+
+	return sb.String()
+}
+
 func (m Model) renderStandings(width int) string {
 	s := m.styles
 
@@ -430,62 +504,33 @@ func (m Model) renderStandings(width int) string {
 		heading = s.muted
 	}
 
-	data := m.items.pointsTable
 	var sb strings.Builder
 
+	// Title row — always visible above the scrollable viewport
 	sb.WriteString(heading.Render("group standings"))
 	sb.WriteString("\n\n")
 
-	// Header row — football columns: P W D L GF GA GD Pts
-	header := fmt.Sprintf("%-3s %-28s %3s %3s %3s %3s %3s %3s %4s %4s",
-		"#", "Team", "P", "W", "D", "L", "GF", "GA", "GD", "Pts",
-	)
-	sb.WriteString(s.tableHeader.Render(header))
-	sb.WriteString("\n")
-	sb.WriteString(s.faint.Render(strings.Repeat("─", width)))
-	sb.WriteString("\n")
-
-	keys := make([]string, 0, len(data.Standings))
-	for k := range data.Standings {
-		keys = append(keys, k)
-	}
-	sort.Slice(keys, func(i, j int) bool {
-		a, b := data.Standings[keys[i]], data.Standings[keys[j]]
-		if a.Points != b.Points {
-			return a.Points > b.Points
-		}
-		if a.GoalDifference != b.GoalDifference {
-			return a.GoalDifference > b.GoalDifference
-		}
-		return a.GoalsFor > b.GoalsFor
-	})
-
-	for i, k := range keys {
-		team := data.Standings[k]
-		row := fmt.Sprintf("%-3d %-28s %3d %3d %3d %3d %3d %3d %+4d %4d",
-			i+1,
-			truncate(team.Team, 27),
-			team.Played,
-			team.Won,
-			team.Drawn,
-			team.Lost,
-			team.GoalsFor,
-			team.GoalsAgainst,
-			team.GoalDifference,
-			team.Points,
-		)
-
-		// Top 2 per group advance (generic highlight for top positions)
-		if i < 2 {
-			sb.WriteString(s.tableRow.Render(row))
-		} else {
-			sb.WriteString(s.tableRowAlt.Render(row))
-		}
-		sb.WriteString("\n")
+	if !m.standingsReady {
+		// Viewport not yet sized (first render before WindowSizeMsg) — render inline
+		sb.WriteString(m.buildStandingsContent(width))
+		return sb.String()
 	}
 
+	// Render the viewport (scrollable standings table)
+	sb.WriteString(m.standingsVP.View())
 	sb.WriteString("\n")
-	sb.WriteString(s.faint.Render("top teams advance from group stage"))
+
+	// Scroll-position hint at the bottom
+	pct := m.standingsVP.ScrollPercent()
+	var hint string
+	if pct <= 0 {
+		hint = "↓ scroll for more  •  ↑↓ / PgUp PgDn"
+	} else if pct >= 1 {
+		hint = "↑ top reached"
+	} else {
+		hint = fmt.Sprintf("↑↓ scroll  •  %.0f%%  •  ← back", pct*100)
+	}
+	sb.WriteString(s.faint.Render(hint))
 
 	return sb.String()
 }
@@ -504,29 +549,39 @@ func (m Model) renderSchedule(width int) string {
 		heading = s.muted
 	}
 
-	data := m.items.matchSchedule
 	var sb strings.Builder
 
 	sb.WriteString(heading.Render("upcoming matches"))
 	sb.WriteString("\n\n")
 
-	keys := make([]string, 0, len(data.Schedule))
-	for k := range data.Schedule {
-		keys = append(keys, k)
-	}
-	sort.Strings(keys)
-
 	header := fmt.Sprintf("%-3s  %-13s  %-13s  %-11s  %-5s  %s",
 		"#", "Home", "Away", "Date", "Time", "Venue")
+
+	sb.WriteString(renderScheduleSection(s, "Today", header, m.items.matchSchedule.Today, width))
+	sb.WriteString("\n")
+	sb.WriteString(renderScheduleSection(s, "Tomorrow", header, m.items.matchSchedule.Tomorrow, width))
+
+	return sb.String()
+}
+
+func renderScheduleSection(s Styles, title, header string, matches []domain.MatchView, width int) string {
+	var sb strings.Builder
+	sb.WriteString(s.gold.Render(title))
+	sb.WriteString("\n")
 	sb.WriteString(s.tableHeader.Render(header))
 	sb.WriteString("\n")
 	sb.WriteString(s.faint.Render(strings.Repeat("─", width)))
 	sb.WriteString("\n")
 
-	for i, k := range keys {
-		match := data.Schedule[k]
+	if len(matches) == 0 {
+		sb.WriteString(s.muted.Render("No matches available"))
+		sb.WriteString("\n")
+		return sb.String()
+	}
+
+	for i, match := range matches {
 		row := fmt.Sprintf("%-3s  %-13s  %-13s  %-11s  %-5s  %s",
-			k,
+			match.MatchNumber,
 			truncate(match.HomeTeam, 13),
 			truncate(match.AwayTeam, 13),
 			truncate(match.Date, 11),
@@ -558,13 +613,6 @@ func (m Model) renderHistorical(width int) string {
 		heading = s.muted
 	}
 
-	data := m.items.historicalWinners
-	years := make([]string, 0, len(data.Winners))
-	for y := range data.Winners {
-		years = append(years, y)
-	}
-	sort.Sort(sort.Reverse(sort.StringSlice(years)))
-
 	var sb strings.Builder
 	sb.WriteString(heading.Render("world cup winners"))
 	sb.WriteString("\n\n")
@@ -575,13 +623,16 @@ func (m Model) renderHistorical(width int) string {
 	sb.WriteString(s.faint.Render(strings.Repeat("─", width)))
 	sb.WriteString("\n")
 
-	for i, yr := range years {
-		w := data.Winners[yr]
+	for i, w := range m.items.historicalWinners {
+		venue := w.Venue
+		if venue == "" {
+			venue = "-"
+		}
 		row := fmt.Sprintf("%-6s  %-15s  %-15s  %s",
-			yr,
+			fmt.Sprintf("%d", w.Year),
 			truncate(w.Winner, 15),
 			truncate(w.RunnerUp, 15),
-			truncate(w.Venue, 30),
+			truncate(venue, 30),
 		)
 		if i%2 == 0 {
 			sb.WriteString(s.tableRow.Render(row))

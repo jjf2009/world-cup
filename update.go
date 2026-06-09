@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"time"
 
 	tea "github.com/charmbracelet/bubbletea"
@@ -110,6 +111,13 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 
 	case liveTickMsg:
 		m.showLiveCursor = !m.showLiveCursor
+		m.refreshData(context.Background())
+		// Refresh standings viewport content after data update
+		if m.standingsReady {
+			oldYOffset := m.standingsVP.YOffset
+			m.standingsVP.SetContent(m.buildStandingsContent(m.standingsVP.Width))
+			m.standingsVP.SetYOffset(oldYOffset)
+		}
 		return m, liveTickCmd()
 
 	case tea.KeyMsg:
@@ -126,10 +134,19 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 
 		switch m.currentView {
 
-		case LiveView, PointsTableView, ScheduleView, HistoricalView, AboutView:
+		case LiveView, ScheduleView, HistoricalView, AboutView:
 			if key == "left" {
 				return m.handleNavToTabView()
 			}
+
+		case PointsTableView:
+			if key == "left" {
+				return m.handleNavToTabView()
+			}
+			// Forward scroll keys to the standings viewport
+			var cmd tea.Cmd
+			m.standingsVP, cmd = m.standingsVP.Update(msg)
+			return m, cmd
 
 		case MatchView:
 			if key == "left" {
@@ -150,6 +167,35 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	case tea.WindowSizeMsg:
 		m.width = msg.Width
 		m.height = msg.Height
+
+		// Compute the available body area for the standings viewport.
+		// Mirrors the sizing logic in View(): totalW capped 80-160, bodyW = totalW - sidebarW - 2
+		// Body style has Padding(1,2) = 4 chars width, 2 rows height.
+		totalW := clamp(m.width-4, 80, 160)
+		sidebarW := 24
+		bodyW := totalW - sidebarW - 2
+		vpW := bodyW - 4 // body padding 2 each side
+
+		// totalH = 90% of terminal height; subtract outer border (2) + body padding (2) + header rows (~4)
+		totalH := int(float64(m.height) * 0.9)
+		vpH := totalH - 8
+		if vpH < 5 {
+			vpH = 5
+		}
+
+		if !m.standingsReady {
+			m.standingsVP.Width = vpW
+			m.standingsVP.Height = vpH
+			m.standingsVP.SetContent(m.buildStandingsContent(vpW))
+			m.standingsReady = true
+		} else {
+			m.standingsVP.Width = vpW
+			m.standingsVP.Height = vpH
+			// re-render content in case column widths changed
+			oldYOffset := m.standingsVP.YOffset
+			m.standingsVP.SetContent(m.buildStandingsContent(vpW))
+			m.standingsVP.SetYOffset(oldYOffset)
+		}
 
 		// Auto-enter live view once terminal size is known
 		if m.currentView == InitialLoadView {
