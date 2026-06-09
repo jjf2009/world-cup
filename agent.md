@@ -1,16 +1,16 @@
-# ipl Repo Guide
+# World Cup TUI Repo Guide
 
-This repository is a terminal-based IPL 2026 viewer built with Go, Bubble Tea, Lip Gloss, and Wish.
-It runs as an SSH TUI server, fetches live cricket data from an API, and renders multiple views such as live scores, all matches, the points table, the schedule, historical winners, and an about screen.
+This repository is a terminal-based FIFA World Cup 2026 TUI viewer built with Go, Bubble Tea, Lip Gloss, and Wish.
+It runs as an SSH TUI server, providing a terminal interface to view matches, standings, schedule, historical winners, and live match details.
 
 ## How The App Works
 
 1. `main.go` starts an SSH server on `0.0.0.0:6767`.
 2. Each SSH session gets a Bubble Tea model from `teaHandler`.
-3. The model initializes by fetching match scores, schedule, points table, live scores, and winners in parallel.
-4. The `Update` loop reacts to API responses, timers, key presses, and window resize events.
+3. The model initializes with populated mock data for live scores, matches, standings, schedule, and historical winners.
+4. The `Update` loop reacts to timers, key presses, and window resize events.
 5. The `View` layer renders the active screen using Lip Gloss styles and table widgets.
-6. Live data is refreshed every 5 seconds, and the live cursor blinks every second.
+6. The live cursor blinks periodically to indicate active operation.
 
 ## Folder Structure
 
@@ -24,7 +24,6 @@ It runs as an SSH TUI server, fetches live cricket data from an API, and renders
 ├── model.go
 ├── README.md
 ├── styles.go
-├── table.go
 ├── update.go
 ├── view.go
 └── cmd/
@@ -48,20 +47,18 @@ This is where the app’s state lives:
 - loading flags for each section
 - window size
 - last update time
-- fetched API data
+- fetched/mocked API data
 - the match table widget and its styles
 
-It also defines `Init`, which kicks off the first batch of API requests and animation timers.
+It also defines `Init`, which kicks off the animation/refresh timers.
 
 ### `update.go`
 
 Contains the Bubble Tea state machine.
 This file decides what happens when the app receives:
 
-- API responses
 - tick messages for loading cursor animation
 - blinking updates for live scores
-- refresh timers
 - keyboard input
 - terminal resize events
 
@@ -76,25 +73,18 @@ Main sections:
 
 - root layout with sidebar and body
 - sidebar tab navigation
-- live match view
+- live match view (rendering match details, status, minute, score, and venue)
 - all matches table
-- points table
+- group standings (points table)
 - upcoming schedule
 - historical winners
 - about screen
 
-It also renders detailed live-match information such as batters, bowler, partnership, wickets, and recent overs, plus squad columns when live match team details are available.
+It also contains `renderSquads` to display squad columns (GK, DEF, MID, FWD) when live match team details are available.
 
-### `table.go`
+### `table.go` (Not present or integrated into main logic)
 
-Builds the all-matches table from API data.
-It sorts matches into:
-
-- live first
-- upcoming next, sorted by time
-- completed last, sorted by most recent
-
-It also normalizes score and date display values and formats the table rows.
+*(Note: Match table is built using Bubble Tea's built-in table component inside `model.go` and `view.go`)*
 
 ### `styles.go`
 
@@ -116,9 +106,8 @@ It exposes typed helper functions for:
 - points table
 - live match scores
 - historical winners
-- squad data
 
-It also contains team-name-to-slug normalization so squad data can be loaded from live match names.
+It also contains a team-to-slug helper for matching team names to their slugs.
 
 ### `cmd/types.go`
 
@@ -140,7 +129,7 @@ Local compose setup for running the service with its supporting environment.
 ### `go.mod`
 
 Declares the module path and dependencies.
-This repo uses Go 1.26.2 and depends mainly on Bubble Tea, Bubbles, Lip Gloss, Wish, SSH, and Godotenv.
+This repo uses Go 1.25.2 and depends mainly on Bubble Tea, Bubbles, Lip Gloss, Wish, SSH, and Godotenv.
 
 ## Runtime Flow In Detail
 
@@ -151,13 +140,11 @@ When a client connects, `teaHandler` creates a new `Model` with a Lip Gloss rend
 
 ### Initial Data Load
 
-`Model.Init()` launches multiple fetch commands in parallel.
-Each fetch command calls into the `cmd` package and returns a typed response message back into `Update()`.
+`Model.Init()` launches timers. The `Model` is initialized with mock data (e.g. Argentina vs France) in `NewModel` for a static-view demonstration. The HTTP client functions in `cmd/http.go` are prepared to query the API endpoints when dynamic loading is enabled.
 
 ### State Updates
 
-`Update()` stores each response into `m.items` and clears the matching loading flag.
-Once all core data has loaded, the app switches to the live view by default.
+`Update()` stores responses or handles user events. Keyboard controls change the views and allow scrolling.
 
 ### Navigation
 
@@ -165,7 +152,7 @@ The app supports both single-key shortcuts and a tab selector view:
 
 - `l` live
 - `m` matches
-- `p` points
+- `p` standings (points table)
 - `s` schedule
 - `h` historical
 - `a` about
@@ -175,22 +162,18 @@ In the tab selector, arrow keys move the selection and Enter or Right opens the 
 
 ### Live Refresh Loop
 
-The app uses three tick loops:
+The app uses two tick loops:
 
 - loading cursor blink while initial requests are pending
 - live cursor blink every second
-- live score refresh every 5 seconds
-
-When live scores refresh, the app may also fetch squad data for the teams currently playing.
 
 ## Data And Environment
 
-The HTTP layer reads `API_URL` from the environment.
+The HTTP layer reads `API_URL` from the environment if configured.
 The server also expects a writable `logs/` directory and uses `.ssh/term_info_ed25519` for its host key if one does not already exist.
 
 ## Notes For Future Changes
 
-- Add new views by extending the view constants in `model.go`, the navigation maps in `view.go`, and the message handling in `update.go`.
+- Add new views by extending the view constants in `model.go` and the navigation maps in `view.go` / `update.go`.
 - Add new API data by defining response types in `cmd/types.go` and fetch helpers in `cmd/http.go`.
-- Keep table formatting changes in `table.go` and visual tweaks in `styles.go`.
-- If you change rendering width behavior, check both the live view and the match table because they use different width rules.
+- Keep visual tweaks and colors in `styles.go`.
