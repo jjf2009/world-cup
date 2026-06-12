@@ -18,13 +18,12 @@ import (
 	"github.com/charmbracelet/wish/bubbletea"
 	"github.com/h0i5/ipl/internal/repository"
 	"github.com/h0i5/ipl/internal/service"
-	"github.com/h0i5/ipl/internal/simulation"
 	"github.com/joho/godotenv"
 )
 
 const (
 	host = "0.0.0.0"
-	port = "6767"
+	port = "22"
 )
 
 func myLoggingMiddleware() wish.Middleware {
@@ -90,7 +89,8 @@ func main() {
 	}
 }
 
-func buildWorldCupService(ctx context.Context) (*service.WorldCupService, error) {
+func buildWorldCupService(_ context.Context) (*service.WorldCupService, error) {
+	// Static data repositories (teams, stadiums, winners — do not change)
 	teams, err := repository.NewJSONTeamRepository("data/football.teams.json")
 	if err != nil {
 		return nil, err
@@ -99,25 +99,17 @@ func buildWorldCupService(ctx context.Context) (*service.WorldCupService, error)
 	if err != nil {
 		return nil, err
 	}
-	matches, err := repository.NewJSONMatchRepository("data/football.matches.json", time.Local)
-	if err != nil {
-		return nil, err
-	}
-	standings, err := repository.NewJSONStandingRepository("data/football.matchtables.json")
-	if err != nil {
-		return nil, err
-	}
 	winners, err := repository.NewJSONWinnerRepository("data/winners.json")
 	if err != nil {
 		return nil, err
 	}
 
-	simulator := simulation.NewSimulator(matches, teams, stadiums)
-	if err := simulator.Start(ctx); err != nil {
-		return nil, err
-	}
+	// Live data repositories — read from fetcher daemon's cache files
+	matches := repository.NewCacheFixtureRepository("cache/fixtures.json")
+	standings := repository.NewCacheStandingRepository("cache/standings.json")
+	live := repository.NewCacheLiveRepository("cache/live_matches.json")
 
-	return service.NewWorldCupService(teams, stadiums, matches, standings, winners, simulator), nil
+	return service.NewWorldCupService(teams, stadiums, matches, standings, winners, live), nil
 }
 
 // teaHandler is called once per SSH session and returns a fresh model.

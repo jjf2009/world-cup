@@ -1,0 +1,16 @@
+[fetcher] 2026/06/12 17:18:55 starting World Cup fetcher daemon
+[fetcher] 2026/06/12 17:18:55 starting update cycle
+[fetcher] 2026/06/12 17:18:55 cached 48 standings to cache/standings.json
+[fetcher] 2026/06/12 17:18:55 update cycle completed with errors in 504.819068ms: failed to fetch scoreboard: failed to decode JSON: parsing time "2026-06-12T19:00Z" as "2006-01-02T15:04:05Z07:00": cannot parse "Z" as ":"
+[fetcher] 2026/06/12 17:18:55 no live matches: sleeping for 15 minutes
+[fetcher] 2026/06/12 17:19:14 received signal terminated, shutting down gracefully
+[fetcher] 2026/06/12 17:19:14 fetcher loop stopped
+[fetcher] 2026/06/12 17:20:23 starting World Cup fetcher daemon
+[fetcher] 2026/06/12 17:20:23 starting update cycle
+[fetcher] 2026/06/12 17:20:23 cached 0 live matches to cache/live_matches.json
+[fetcher] 2026/06/12 17:20:23 cached 2 fixtures to cache/fixtures.json
+[fetcher] 2026/06/12 17:20:23 cached 48 standings to cache/standings.json
+[fetcher] 2026/06/12 17:20:23 update cycle completed successfully in 607.444387ms
+[fetcher] 2026/06/12 17:20:23 no live matches: sleeping for 15 minutes
+[fetcher] 2026/06/12 17:20:38 received signal terminated, shutting down gracefully
+[fetcher] 2026/06/12 17:20:38 fetcher loop stopped

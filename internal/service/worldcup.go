@@ -77,13 +77,19 @@ func (s *WorldCupService) GetStandings(ctx context.Context) ([]domain.StandingVi
 
 	views := make([]domain.StandingView, 0, len(standings))
 	for _, standing := range standings {
+		teamName := standing.TeamID
 		team, err := s.teams.ByID(ctx, standing.TeamID)
 		if err != nil {
-			return nil, err
+			if !repository.IsNotFound(err) {
+				return nil, err
+			}
+			// Cache repositories store team names in TeamID; use it directly.
+		} else {
+			teamName = team.Name
 		}
 		views = append(views, domain.StandingView{
 			Group:          standing.Group,
-			Team:           team.Name,
+			Team:           teamName,
 			Played:         standing.Played,
 			Won:            standing.Won,
 			Drawn:          standing.Drawn,
