@@ -1,0 +1,57 @@
+2026/06/09 16:47:25 Starting SSH server on 0.0.0.0:6767
+2026/06/09 16:47:28 Shutting down...
+2026/06/09 16:48:25 Starting SSH server on 0.0.0.0:6767
+2026/06/09 16:49:23 INFO connect ip=[::1]:39666 user=jjf2009
+2026/06/09 16:50:16 INFO disconnect ip=[::1]:39666 user=jjf2009 duration=53.730327457s
+2026/06/09 16:53:17 INFO connect ip=[::1]:38230 user=jjf2009
+2026/06/09 17:44:38 Starting SSH server on 0.0.0.0:6767
+2026/06/09 17:45:12 INFO connect ip=[::1]:35754 user=jjf2009
+2026/06/09 17:48:50 Shutting down...
+2026/06/09 17:48:50 INFO disconnect ip=[::1]:35754 user=jjf2009 duration=3m37.518336908s
+2026/06/09 18:06:44 Starting SSH server on 0.0.0.0:6767
+2026/06/09 18:06:49 INFO connect ip=[::1]:43270 user=jjf2009
+2026/06/09 18:06:57 INFO disconnect ip=[::1]:43270 user=jjf2009 duration=7.49829667s
+2026/06/09 18:07:40 INFO connect ip=[::1]:47672 user=jjf2009
+2026/06/09 18:07:55 INFO disconnect ip=[::1]:47672 user=jjf2009 duration=15.568995935s
+2026/06/09 18:33:45 INFO connect ip=[::1]:46088 user=jjf2009
+2026/06/09 19:21:12 Starting SSH server on 0.0.0.0:6767
+2026/06/09 19:23:17 INFO connect ip=100.111.190.111:34940 user=jjf2009
+2026/06/09 19:25:15 INFO disconnect ip=100.111.190.111:34940 user=jjf2009 duration=1m58.267656139s
+2026/06/09 19:28:02 INFO connect ip=100.111.190.111:48348 user=jjf2009
+2026/06/09 19:28:04 INFO disconnect ip=100.111.190.111:48348 user=jjf2009 duration=2.492124169s
+2026/06/09 19:57:49 INFO connect ip=[2401:4900:ac9c:c1f5:95fe:ddf5:6f09:aca5]:48420 user=jjf2009
+2026/06/09 20:00:41 INFO disconnect ip=[2401:4900:ac9c:c1f5:95fe:ddf5:6f09:aca5]:48420 user=jjf2009 duration=2m51.74223234s
+2026/06/09 20:00:47 INFO connect ip=[2401:4900:ac9c:c1f5:95fe:ddf5:6f09:aca5]:43290 user=jjf2009
+2026/06/09 20:02:48 INFO disconnect ip=[2401:4900:ac9c:c1f5:95fe:ddf5:6f09:aca5]:43290 user=jjf2009 duration=2m1.17517439s
+2026/06/09 20:08:39 Shutting down...
+2026/06/09 20:08:42 Starting SSH server on 0.0.0.0:6767
+2026/06/09 20:08:53 INFO connect ip=[2401:4900:ac9c:c1f5:95fe:ddf5:6f09:aca5]:49672 user=jjf2009
+2026/06/09 20:09:31 INFO disconnect ip=[2401:4900:ac9c:c1f5:95fe:ddf5:6f09:aca5]:49672 user=jjf2009 duration=38.35392542s
+2026/06/09 20:10:05 Shutting down...
+2026/06/09 20:10:09 Starting SSH server on 0.0.0.0:6767
+2026/06/09 20:10:14 INFO connect ip=[2401:4900:ac9c:c1f5:95fe:ddf5:6f09:aca5]:36586 user=jjf2009
+2026/06/09 20:10:27 INFO disconnect ip=[2401:4900:ac9c:c1f5:95fe:ddf5:6f09:aca5]:36586 user=jjf2009 duration=12.992163135s
+2026/06/09 20:19:25 INFO connect ip=[2401:4900:1c44:30d9:ddef:23d3:f766:6bff]:64627 user=parshuram
+2026/06/09 20:19:48 INFO disconnect ip=[2401:4900:1c44:30d9:ddef:23d3:f766:6bff]:64627 user=parshuram duration=22.471283495s
+2026/06/09 20:55:06 INFO connect ip=100.111.190.111:60528 user=jjf2009
+2026/06/09 20:55:17 Shutting down...
+2026/06/09 20:55:17 INFO disconnect ip=100.111.190.111:60528 user=jjf2009 duration=10.946153799s
+2026/06/09 21:05:04 Starting SSH server on 0.0.0.0:6767
+2026/06/09 21:05:15 Shutting down...
+2026/06/09 21:05:31 Starting SSH server on 0.0.0.0:6767
+2026/06/09 21:05:50 INFO connect ip=[::1]:57900 user=jjf2009
+2026/06/09 21:06:08 INFO disconnect ip=[::1]:57900 user=jjf2009 duration=18.032951357s
+2026/06/09 21:07:00 INFO connect ip=[::1]:45642 user=jjf2009
+2026/06/09 21:07:30 INFO disconnect ip=[::1]:45642 user=jjf2009 duration=30.712426488s
+2026/06/09 21:07:39 INFO connect ip=[::1]:58506 user=jjf2009
+2026/06/09 21:08:03 INFO disconnect ip=[::1]:58506 user=jjf2009 duration=23.579018182s
+2026/06/10 16:50:27 Starting SSH server on 0.0.0.0:6767
+2026/06/10 16:50:30 Shutting down...
+2026/06/12 17:17:10 Starting SSH server on 0.0.0.0:22
+2026/06/12 17:17:10 server error: listen tcp 0.0.0.0:22: bind: permission denied
+2026/06/14 03:52:53 Starting SSH server on 0.0.0.0:22
+2026/06/14 03:52:53 server error: listen tcp 0.0.0.0:22: bind: permission denied
+2026/06/14 03:54:30 Starting SSH server on 0.0.0.0:6767
+2026/06/14 03:54:46 INFO connect ip=[::1]:56628 user=jjf2009
+2026/06/14 03:59:00 INFO disconnect ip=[::1]:56628 user=jjf2009 duration=4m13.835188549s
+2026/06/14 03:59:08 Shutting down...

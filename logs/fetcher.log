@@ -1,0 +1,61 @@
+[fetcher] 2026/06/12 17:18:55 starting World Cup fetcher daemon
+[fetcher] 2026/06/12 17:18:55 starting update cycle
+[fetcher] 2026/06/12 17:18:55 cached 48 standings to cache/standings.json
+[fetcher] 2026/06/12 17:18:55 update cycle completed with errors in 504.819068ms: failed to fetch scoreboard: failed to decode JSON: parsing time "2026-06-12T19:00Z" as "2006-01-02T15:04:05Z07:00": cannot parse "Z" as ":"
+[fetcher] 2026/06/12 17:18:55 no live matches: sleeping for 15 minutes
+[fetcher] 2026/06/12 17:19:14 received signal terminated, shutting down gracefully
+[fetcher] 2026/06/12 17:19:14 fetcher loop stopped
+[fetcher] 2026/06/12 17:20:23 starting World Cup fetcher daemon
+[fetcher] 2026/06/12 17:20:23 starting update cycle
+[fetcher] 2026/06/12 17:20:23 cached 0 live matches to cache/live_matches.json
+[fetcher] 2026/06/12 17:20:23 cached 2 fixtures to cache/fixtures.json
+[fetcher] 2026/06/12 17:20:23 cached 48 standings to cache/standings.json
+[fetcher] 2026/06/12 17:20:23 update cycle completed successfully in 607.444387ms
+[fetcher] 2026/06/12 17:20:23 no live matches: sleeping for 15 minutes
+[fetcher] 2026/06/12 17:20:38 received signal terminated, shutting down gracefully
+[fetcher] 2026/06/12 17:20:38 fetcher loop stopped
+[fetcher] 2026/06/14 03:52:38 starting World Cup fetcher daemon
+[fetcher] 2026/06/14 03:52:38 starting update cycle
+[fetcher] 2026/06/14 03:52:45 cached 1 live matches to cache/live_matches.json
+[fetcher] 2026/06/14 03:52:45 cached 3 fixtures to cache/fixtures.json
+[fetcher] 2026/06/14 03:52:46 cached 48 standings to cache/standings.json
+[fetcher] 2026/06/14 03:52:46 update cycle completed successfully in 7.256501546s
+[fetcher] 2026/06/14 03:52:46 live match active: sleeping for 60 seconds
+[fetcher] 2026/06/14 03:53:46 starting update cycle
+[fetcher] 2026/06/14 03:53:47 cached 1 live matches to cache/live_matches.json
+[fetcher] 2026/06/14 03:53:47 cached 3 fixtures to cache/fixtures.json
+[fetcher] 2026/06/14 03:53:48 cached 48 standings to cache/standings.json
+[fetcher] 2026/06/14 03:53:48 update cycle completed successfully in 2.208026906s
+[fetcher] 2026/06/14 03:53:48 live match active: sleeping for 60 seconds
+[fetcher] 2026/06/14 03:54:48 starting update cycle
+[fetcher] 2026/06/14 03:54:49 cached 1 live matches to cache/live_matches.json
+[fetcher] 2026/06/14 03:54:49 cached 3 fixtures to cache/fixtures.json
+[fetcher] 2026/06/14 03:54:49 cached 48 standings to cache/standings.json
+[fetcher] 2026/06/14 03:54:49 update cycle completed successfully in 1.030841287s
+[fetcher] 2026/06/14 03:54:49 live match active: sleeping for 60 seconds
+[fetcher] 2026/06/14 03:55:49 starting update cycle
+[fetcher] 2026/06/14 03:55:50 cached 1 live matches to cache/live_matches.json
+[fetcher] 2026/06/14 03:55:50 cached 3 fixtures to cache/fixtures.json
+[fetcher] 2026/06/14 03:55:51 cached 48 standings to cache/standings.json
+[fetcher] 2026/06/14 03:55:51 update cycle completed successfully in 2.004739289s
+[fetcher] 2026/06/14 03:55:51 live match active: sleeping for 60 seconds
+[fetcher] 2026/06/14 03:56:51 starting update cycle
+[fetcher] 2026/06/14 03:56:52 cached 1 live matches to cache/live_matches.json
+[fetcher] 2026/06/14 03:56:52 cached 3 fixtures to cache/fixtures.json
+[fetcher] 2026/06/14 03:56:52 cached 48 standings to cache/standings.json
+[fetcher] 2026/06/14 03:56:52 update cycle completed successfully in 825.264808ms
+[fetcher] 2026/06/14 03:56:52 live match active: sleeping for 60 seconds
+[fetcher] 2026/06/14 03:57:52 starting update cycle
+[fetcher] 2026/06/14 03:57:53 cached 1 live matches to cache/live_matches.json
+[fetcher] 2026/06/14 03:57:53 cached 3 fixtures to cache/fixtures.json
+[fetcher] 2026/06/14 03:57:54 cached 48 standings to cache/standings.json
+[fetcher] 2026/06/14 03:57:54 update cycle completed successfully in 2.038711538s
+[fetcher] 2026/06/14 03:57:54 live match active: sleeping for 60 seconds
+[fetcher] 2026/06/14 03:58:54 starting update cycle
+[fetcher] 2026/06/14 03:58:55 cached 1 live matches to cache/live_matches.json
+[fetcher] 2026/06/14 03:58:55 cached 3 fixtures to cache/fixtures.json
+[fetcher] 2026/06/14 03:58:56 cached 48 standings to cache/standings.json
+[fetcher] 2026/06/14 03:58:56 update cycle completed successfully in 1.84868094s
+[fetcher] 2026/06/14 03:58:56 live match active: sleeping for 60 seconds
+[fetcher] 2026/06/14 03:59:11 received signal interrupt, shutting down gracefully
+[fetcher] 2026/06/14 03:59:11 fetcher loop stopped

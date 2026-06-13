@@ -1,0 +1,23 @@
+[Unit]
+Description=World Cup 2026 Fetcher – ESPN data background daemon
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+WorkingDirectory=/opt/worldcup
+ExecStart=/opt/worldcup/fetcher
+Restart=always
+RestartSec=10
+StandardOutput=append:/opt/worldcup/logs/fetcher.log
+StandardError=append:/opt/worldcup/logs/fetcher.log
+
+# Environment overrides (optional – defaults work out of the box)
+# Environment="LIVE_CACHE_PATH=cache/live_matches.json"
+# Environment="FIXTURES_CACHE_PATH=cache/fixtures.json"
+# Environment="STANDINGS_CACHE_PATH=cache/standings.json"
+# Environment="TEAMS_PATH=data/football.teams.json"
+# Environment="LOG_PATH=logs/fetcher.log"
+
+[Install]
+WantedBy=multi-user.target
