@@ -49,3 +49,9 @@
 2026/06/10 16:50:30 Shutting down...
 2026/06/12 17:17:10 Starting SSH server on 0.0.0.0:22
 2026/06/12 17:17:10 server error: listen tcp 0.0.0.0:22: bind: permission denied
+2026/06/14 03:52:53 Starting SSH server on 0.0.0.0:22
+2026/06/14 03:52:53 server error: listen tcp 0.0.0.0:22: bind: permission denied
+2026/06/14 03:54:30 Starting SSH server on 0.0.0.0:6767
+2026/06/14 03:54:46 INFO connect ip=[::1]:56628 user=jjf2009
+2026/06/14 03:59:00 INFO disconnect ip=[::1]:56628 user=jjf2009 duration=4m13.835188549s
+2026/06/14 03:59:08 Shutting down...

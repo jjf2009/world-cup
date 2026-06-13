@@ -1,12 +1,140 @@
 [
   {
-    "year": 2022,
+    "year": 1930,
+    "winner": "Uruguay",
+    "runner_up": "Argentina",
+    "venue": "Uruguay"
+  },
+  {
+    "year": 1934,
+    "winner": "Italy",
+    "runner_up": "Czechoslovakia",
+    "venue": "Italy"
+  },
+  {
+    "year": 1938,
+    "winner": "Italy",
+    "runner_up": "Hungary",
+    "venue": "France"
+  },
+  {
+    "year": 1950,
+    "winner": "Uruguay",
+    "runner_up": "Brazil",
+    "venue": "Brazil"
+  },
+  {
+    "year": 1954,
+    "winner": "West Germany",
+    "runner_up": "Hungary",
+    "venue": "Switzerland"
+  },
+  {
+    "year": 1958,
+    "winner": "Brazil",
+    "runner_up": "Sweden",
+    "venue": "Sweden"
+  },
+  {
+    "year": 1962,
+    "winner": "Brazil",
+    "runner_up": "Czechoslovakia",
+    "venue": "Chile"
+  },
+  {
+    "year": 1966,
+    "winner": "England",
+    "runner_up": "West Germany",
+    "venue": "England"
+  },
+  {
+    "year": 1970,
+    "winner": "Brazil",
+    "runner_up": "Italy",
+    "venue": "Mexico"
+  },
+  {
+    "year": 1974,
+    "winner": "West Germany",
+    "runner_up": "Netherlands",
+    "venue": "West Germany"
+  },
+  {
+    "year": 1978,
     "winner": "Argentina",
-    "runner_up": "France"
+    "runner_up": "Netherlands",
+    "venue": "Argentina"
+  },
+  {
+    "year": 1982,
+    "winner": "Italy",
+    "runner_up": "West Germany",
+    "venue": "Spain"
+  },
+  {
+    "year": 1986,
+    "winner": "Argentina",
+    "runner_up": "West Germany",
+    "venue": "Mexico"
+  },
+  {
+    "year": 1990,
+    "winner": "West Germany",
+    "runner_up": "Argentina",
+    "venue": "Italy"
+  },
+  {
+    "year": 1994,
+    "winner": "Brazil",
+    "runner_up": "Italy",
+    "venue": "United States"
+  },
+  {
+    "year": 1998,
+    "winner": "France",
+    "runner_up": "Brazil",
+    "venue": "France"
+  },
+  {
+    "year": 2002,
+    "winner": "Brazil",
+    "runner_up": "Germany",
+    "venue": "South Korea & Japan"
+  },
+  {
+    "year": 2006,
+    "winner": "Italy",
+    "runner_up": "France",
+    "venue": "Germany"
+  },
+  {
+    "year": 2010,
+    "winner": "Spain",
+    "runner_up": "Netherlands",
+    "venue": "South Africa"
+  },
+  {
+    "year": 2014,
+    "winner": "Germany",
+    "runner_up": "Argentina",
+    "venue": "Brazil"
   },
   {
     "year": 2018,
     "winner": "France",
-    "runner_up": "Croatia"
+    "runner_up": "Croatia",
+    "venue": "Russia"
+  },
+  {
+    "year": 2022,
+    "winner": "Argentina",
+    "runner_up": "France",
+    "venue": "Qatar"
+  },
+  {
+    "year": 2026,
+    "winner": "TBD",
+    "runner_up": "TBD",
+    "venue": "United States, Canada & Mexico"
   }
 ]

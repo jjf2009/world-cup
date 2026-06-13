@@ -76,8 +76,8 @@ type Model struct {
 	matchTableStyles table.Styles
 
 	// standingsVP is a scrollable viewport for the standings table.
-	standingsVP      viewport.Model
-	standingsReady   bool
+	standingsVP    viewport.Model
+	standingsReady bool
 
 	service WorldCupDataService
 	lastErr string
