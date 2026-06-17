@@ -101,12 +101,11 @@ func main() {
 			logger.Printf("update cycle completed successfully in %v", duration)
 		}
 
-		sleepDuration := 15 * time.Minute
+		sleepDuration := 5 * time.Second
 		if hasLiveMatches {
-			sleepDuration = 60 * time.Second
-			logger.Println("live match active: sleeping for 60 seconds")
+			logger.Println("live match active: sleeping for 5 seconds")
 		} else {
-			logger.Println("no live matches: sleeping for 15 minutes")
+			logger.Println("no live matches: sleeping for 5 seconds")
 		}
 
 		select {

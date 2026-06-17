@@ -12,6 +12,7 @@ import (
 )
 
 var tabLabels = map[int]struct{ key, label string }{
+	DashboardView:   {"d", "dashboard"},
 	LiveView:        {"l", "live"},
 	MatchView:       {"m", "matches"},
 	PointsTableView: {"p", "standings"},
@@ -160,6 +161,9 @@ func (m Model) renderBody(width, height int) string {
 
 	var content string
 	switch activeView {
+	case DashboardView:
+		content = m.renderDashboard(innerW)
+
 	case LiveView:
 		content = m.renderLive(innerW)
 
@@ -203,21 +207,45 @@ func (m Model) renderLive(width int) string {
 	sb.WriteString(heading.Render("live matches"))
 	sb.WriteString("\n\n")
 
-	loc, err := time.LoadLocation("Asia/Kolkata")
-	if err != nil {
-		loc = time.UTC
+	// Prefer the cache's own LastUpdated field; fall back to m.lastUpdated
+	cacheTime := m.items.liveMatch.LastUpdated
+	if cacheTime.IsZero() {
+		cacheTime = m.lastUpdated
 	}
-
 	lastUpdated := "never"
-	if !m.lastUpdated.IsZero() {
-		lastUpdated = m.lastUpdated.In(loc).Format("15:04:05")
+	if !cacheTime.IsZero() {
+		lastUpdated = cacheTime.UTC().Format("15:04 UTC")
 	}
 
 	match := m.items.liveMatch
 	if match.ID == "" {
-		sb.WriteString(s.muted.Render("No matches live right now"))
-		sb.WriteString("\n")
-		sb.WriteString(s.faint.Render("Waiting for live match data..."))
+		sb.WriteString(s.muted.Render("No live matches currently in progress."))
+		sb.WriteString("\n\n")
+
+		next := nextUpcomingMatch(m.items.matches)
+		if next != nil {
+			now := time.Now().UTC()
+			timeUntil := next.Kickoff.UTC().Sub(now)
+
+			sb.WriteString(s.gold.Render("Next Match"))
+			sb.WriteString("\n")
+			sb.WriteString(s.teamName.Render(next.HomeTeam + "  vs  " + next.AwayTeam))
+			sb.WriteString("\n")
+			kickoffStr := next.Kickoff.UTC().Format("02 Jan · 15:04 UTC")
+			sb.WriteString(s.muted.Render(kickoffStr))
+			sb.WriteString("\n")
+			if next.Venue != "" && next.Venue != "TBD" {
+				sb.WriteString(s.venue.Render("📍 " + next.Venue))
+				sb.WriteString("\n")
+			}
+			if timeUntil > 0 {
+				sb.WriteString("\n")
+				sb.WriteString(s.faint.Render("Next Kickoff: "))
+				sb.WriteString(s.highlight.Render(formatCountdown(timeUntil)))
+			}
+		} else {
+			sb.WriteString(s.faint.Render("No upcoming matches scheduled."))
+		}
 		return sb.String()
 	}
 
@@ -824,3 +852,237 @@ func truncateVenue(s string, max int) string {
 	}
 	return "… " + last
 }
+
+// ── Dashboard ─────────────────────────────────────────────────────────────────
+
+func (m Model) renderDashboard(width int) string {
+	s := m.styles
+
+	heading := s.header
+	if m.currentView == TabView {
+		heading = s.muted
+	}
+
+	var sb strings.Builder
+	sb.WriteString(heading.Bold(true).Render("World Cup 2026"))
+	sb.WriteString("\n\n")
+
+	// ── Tournament Stage ──────────────────────────────────────────────
+	stage := deriveTournamentStage(m.items.standings)
+	sb.WriteString(s.faint.Render("Current Stage"))
+	sb.WriteString("\n")
+	sb.WriteString(s.gold.Bold(true).Render(stage))
+	sb.WriteString("\n\n")
+
+	// ── Match Counts ──────────────────────────────────────────────────
+	counts := todayMatchCounts(m.items.matches)
+	divider := s.faint.Render(strings.Repeat("─", min(width, 40)))
+	sb.WriteString(divider)
+	sb.WriteString("\n")
+	sb.WriteString(fmt.Sprintf("%-22s %s\n",
+		s.muted.Render("Today's Matches"),
+		s.score.Render(fmt.Sprintf("%d", counts.total)),
+	))
+	sb.WriteString(fmt.Sprintf("%-22s %s\n",
+		s.liveDot.Render("● Live"),
+		s.score.Render(fmt.Sprintf("%d", counts.live)),
+	))
+	sb.WriteString(fmt.Sprintf("%-22s %s\n",
+		s.faint.Render("  Completed"),
+		s.faint.Render(fmt.Sprintf("%d", counts.completed)),
+	))
+	sb.WriteString(fmt.Sprintf("%-22s %s\n",
+		s.faint.Render("  Upcoming"),
+		s.faint.Render(fmt.Sprintf("%d", counts.upcoming)),
+	))
+	sb.WriteString(divider)
+	sb.WriteString("\n\n")
+
+	// ── Live Match or Next Match ──────────────────────────────────────
+	live := m.items.liveMatch
+	if live.ID != "" {
+		dot := "●"
+		if !m.showLiveCursor {
+			dot = " "
+		}
+		sb.WriteString(s.liveDot.Render(dot + " LIVE NOW"))
+		sb.WriteString("\n")
+		sb.WriteString(s.teamName.Bold(true).Render(live.HomeTeam + "  vs  " + live.AwayTeam))
+		sb.WriteString("\n")
+		scoreStr := fmt.Sprintf("%d – %d", live.HomeScore, live.AwayScore)
+		if live.Minute > 0 {
+			scoreStr += fmt.Sprintf("  (%d')", live.Minute)
+		}
+		sb.WriteString(s.score.Render(scoreStr))
+		sb.WriteString("\n")
+		if live.Venue != "" {
+			sb.WriteString(s.venue.Render("📍 " + live.Venue))
+			sb.WriteString("\n")
+		}
+	} else {
+		next := nextUpcomingMatch(m.items.matches)
+		if next != nil {
+			now := time.Now().UTC()
+			timeUntil := next.Kickoff.UTC().Sub(now)
+			sb.WriteString(s.gold.Render("Next Match"))
+			sb.WriteString("\n")
+			sb.WriteString(s.teamName.Render(next.HomeTeam + "  vs  " + next.AwayTeam))
+			sb.WriteString("\n")
+			sb.WriteString(s.muted.Render(next.Kickoff.UTC().Format("02 Jan · 15:04 UTC")))
+			sb.WriteString("\n")
+			if next.Venue != "" && next.Venue != "TBD" {
+				sb.WriteString(s.venue.Render("📍 " + next.Venue))
+				sb.WriteString("\n")
+			}
+			if timeUntil > 0 {
+				sb.WriteString(s.faint.Render("Next Kickoff: "))
+				sb.WriteString(s.highlight.Render(formatCountdown(timeUntil)))
+				sb.WriteString("\n")
+			}
+		} else {
+			sb.WriteString(s.muted.Render("No live matches currently in progress."))
+			sb.WriteString("\n")
+		}
+	}
+	sb.WriteString("\n")
+
+	// ── Cache Timestamp ───────────────────────────────────────────────
+	cacheTime := m.items.liveMatch.LastUpdated
+	if cacheTime.IsZero() {
+		cacheTime = m.lastUpdated
+	}
+	if !cacheTime.IsZero() {
+		sb.WriteString(s.faint.Render("Last Updated: " + cacheTime.UTC().Format("15:04 UTC")))
+		sb.WriteString("\n\n")
+	}
+
+	// ── Top Teams ─────────────────────────────────────────────────────
+	topTeams := topStandingTeams(m.items.standings, 3)
+	if len(topTeams) > 0 {
+		sb.WriteString(s.tableHeader.Render("Top Teams"))
+		sb.WriteString("\n")
+		medals := []string{"🥇", "🥈", "🥉"}
+		for i, t := range topTeams {
+			medal := medals[i]
+			row := fmt.Sprintf("%s  %-22s %s",
+				medal,
+				truncate(t.Team, 20),
+				s.faint.Render(fmt.Sprintf("%dpts", t.Points)),
+			)
+			sb.WriteString(s.tableRow.Render(row))
+			sb.WriteString("\n")
+		}
+		sb.WriteString("\n")
+	}
+
+	// ── Navigation hint ───────────────────────────────────────────────
+	sb.WriteString(s.faint.Render("[l] Live  [m] Matches  [p] Standings"))
+
+	return sb.String()
+}
+
+// ── Shared helpers ────────────────────────────────────────────────────────────
+
+type matchCounts struct {
+	total     int
+	live      int
+	completed int
+	upcoming  int
+}
+
+// todayMatchCounts counts matches scheduled for today (UTC).
+func todayMatchCounts(matches []domain.MatchView) matchCounts {
+	now := time.Now().UTC()
+	today := time.Date(now.Year(), now.Month(), now.Day(), 0, 0, 0, 0, time.UTC)
+	tomorrow := today.AddDate(0, 0, 1)
+
+	var c matchCounts
+	for _, m := range matches {
+		k := m.Kickoff.UTC()
+		if k.Before(today) || !k.Before(tomorrow) {
+			continue
+		}
+		c.total++
+		switch m.Status {
+		case domain.StatusLive:
+			c.live++
+		case domain.StatusFinished:
+			c.completed++
+		default:
+			c.upcoming++
+		}
+	}
+	return c
+}
+
+// nextUpcomingMatch returns the earliest future match that hasn't started yet.
+func nextUpcomingMatch(matches []domain.MatchView) *domain.MatchView {
+	now := time.Now().UTC()
+	for i := range matches {
+		m := matches[i]
+		if m.Kickoff.UTC().After(now) && m.Status != domain.StatusFinished {
+			return &matches[i]
+		}
+	}
+	return nil
+}
+
+// formatCountdown formats a duration as "2h 14m" or "45m".
+func formatCountdown(d time.Duration) string {
+	if d <= 0 {
+		return "Starting soon"
+	}
+	h := int(d.Hours())
+	mins := int(d.Minutes()) % 60
+	if h > 0 {
+		return fmt.Sprintf("%dh %02dm", h, mins)
+	}
+	return fmt.Sprintf("%dm", int(d.Minutes()))
+}
+
+// deriveTournamentStage inspects standings group names to determine the current stage.
+func deriveTournamentStage(standings []domain.StandingView) string {
+	for _, sv := range standings {
+		g := strings.ToLower(sv.Group)
+		switch {
+		case strings.Contains(g, "round of 32"):
+			return "Round of 32"
+		case strings.Contains(g, "round of 16"):
+			return "Round of 16"
+		case strings.Contains(g, "quarter"):
+			return "Quarter Finals"
+		case strings.Contains(g, "semi"):
+			return "Semi Finals"
+		case strings.Contains(g, "final"):
+			return "Final"
+		}
+	}
+	return "Group Stage"
+}
+
+// topStandingTeams returns the top n teams ranked by points across all groups.
+func topStandingTeams(standings []domain.StandingView, n int) []domain.StandingView {
+	sorted := append([]domain.StandingView(nil), standings...)
+	sort.Slice(sorted, func(i, j int) bool {
+		if sorted[i].Points != sorted[j].Points {
+			return sorted[i].Points > sorted[j].Points
+		}
+		if sorted[i].GoalDifference != sorted[j].GoalDifference {
+			return sorted[i].GoalDifference > sorted[j].GoalDifference
+		}
+		return sorted[i].GoalsFor > sorted[j].GoalsFor
+	})
+	if len(sorted) > n {
+		sorted = sorted[:n]
+	}
+	return sorted
+}
+
+// min returns the smaller of two ints.
+func min(a, b int) int {
+	if a < b {
+		return a
+	}
+	return b
+}
+

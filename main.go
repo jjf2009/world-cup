@@ -40,7 +40,7 @@ func myLoggingMiddleware() wish.Middleware {
 func main() {
 	godotenv.Load()
 
-	// Ensure logs directory exists
+
 	_ = os.MkdirAll("logs", 0755)
 
 	// log to a file

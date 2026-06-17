@@ -55,3 +55,17 @@
 2026/06/14 03:54:46 INFO connect ip=[::1]:56628 user=jjf2009
 2026/06/14 03:59:00 INFO disconnect ip=[::1]:56628 user=jjf2009 duration=4m13.835188549s
 2026/06/14 03:59:08 Shutting down...
+2026/06/17 07:57:06 Starting SSH server on 0.0.0.0:22
+2026/06/17 07:57:06 server error: listen tcp 0.0.0.0:22: bind: permission denied
+2026/06/17 07:58:08 Starting SSH server on 0.0.0.0:6767
+2026/06/17 07:58:39 INFO connect ip=[::1]:49602 user=jjf2009
+2026/06/17 09:43:13 INFO disconnect ip=[::1]:49602 user=jjf2009 duration=1h44m34.352778331s
+2026/06/17 09:43:17 INFO connect ip=[::1]:51534 user=jjf2009
+2026/06/17 09:47:00 INFO disconnect ip=[::1]:51534 user=jjf2009 duration=3m43.177259568s
+2026/06/17 09:47:01 INFO connect ip=[::1]:40706 user=jjf2009
+2026/06/17 09:54:32 INFO disconnect ip=[::1]:40706 user=jjf2009 duration=7m30.850752487s
+2026/06/17 09:54:36 Shutting down...
+2026/06/17 09:54:40 Starting SSH server on 0.0.0.0:6767
+2026/06/17 09:54:43 INFO connect ip=[::1]:56800 user=jjf2009
+2026/06/17 10:11:35 Shutting down...
+2026/06/17 10:11:36 INFO disconnect ip=[::1]:56800 user=jjf2009 duration=16m52.052092485s
