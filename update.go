@@ -9,6 +9,8 @@ import (
 
 func (m Model) handleTabNavigation(key string) (tea.Model, tea.Cmd) {
 	switch key {
+	case "d":
+		m.selectedTab = DashboardView
 	case "l":
 		m.selectedTab = LiveView
 	case "m":
@@ -128,13 +130,13 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		}
 
 		switch key {
-		case "l", "m", "p", "s", "h", "a":
+		case "d", "l", "m", "p", "s", "h", "a":
 			return m.handleTabNavigation(key)
 		}
 
 		switch m.currentView {
 
-		case LiveView, ScheduleView, HistoricalView, AboutView:
+		case DashboardView, LiveView, ScheduleView, HistoricalView, AboutView:
 			if key == "left" {
 				return m.handleNavToTabView()
 			}
@@ -197,10 +199,10 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			m.standingsVP.SetYOffset(oldYOffset)
 		}
 
-		// Auto-enter live view once terminal size is known
+		// Auto-enter dashboard view once terminal size is known
 		if m.currentView == InitialLoadView {
-			m.currentView = LiveView
-			m.selectedTab = LiveView
+			m.currentView = DashboardView
+			m.selectedTab = DashboardView
 		}
 	}
 

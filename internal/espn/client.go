@@ -9,7 +9,7 @@ import (
 )
 
 const (
-	DefaultScoreboardURL = "https://site.api.espn.com/apis/site/v2/sports/soccer/fifa.world/scoreboard?limit=200"
+	DefaultScoreboardURL = "https://site.api.espn.com/apis/site/v2/sports/soccer/fifa.world/scoreboard?dates=20260611-20260719&limit=200"
 	DefaultStandingsURL  = "https://site.api.espn.com/apis/v2/sports/soccer/fifa.world/standings"
 )
 

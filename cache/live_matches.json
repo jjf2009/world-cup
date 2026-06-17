@@ -1,16 +1,4 @@
 {
-  "updated_at": "2026-06-14T03:58:55.305097577+05:30",
-  "data": [
-    {
-      "id": "760419",
-      "home_team": "Brazil",
-      "away_team": "Morocco",
-      "home_score": 0,
-      "away_score": 1,
-      "minute": "24'",
-      "status": "24'",
-      "venue": "MetLife Stadium",
-      "group": "C"
-    }
-  ]
+  "updated_at": "2026-06-17T19:27:51.22113236+05:30",
+  "data": null
 }

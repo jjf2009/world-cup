@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"time"
 
@@ -17,6 +18,7 @@ const (
 	InitialLoadView = iota
 	TabView
 
+	DashboardView
 	LiveView
 	MatchView
 	PointsTableView
@@ -28,6 +30,7 @@ const (
 )
 
 var tabOrder = []int{
+	DashboardView,
 	LiveView,
 	MatchView,
 	PointsTableView,
@@ -130,6 +133,7 @@ func NewModel(renderer *lipgloss.Renderer, service WorldCupDataService) Model {
 		showLiveCursor: true,
 
 		loadingMap: map[int]bool{
+			DashboardView:   false,
 			LiveView:        false,
 			MatchView:       false,
 			PointsTableView: false,
@@ -162,7 +166,7 @@ func (m *Model) refreshData(ctx context.Context) {
 	}
 
 	liveMatch, err := m.service.GetLiveMatch(ctx)
-	if err != nil {
+	if err != nil && !errors.Is(err, domain.ErrNotFound) {
 		m.lastErr = err.Error()
 		return
 	}
