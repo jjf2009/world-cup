@@ -1,94 +1,217 @@
 # World Cup 2026 TUI
 
-A terminal-based FIFA World Cup 2026 viewer built using **Go**, **Bubble Tea**, **Lip Gloss**, and **Wish**. The application runs as a secure SSH server, allowing users to connect and check match details, standings, and historical data directly from their terminals.
+A terminal-based FIFA World Cup 2026 experience built with Go, Bubble Tea, Lip Gloss, and Wish.
 
-Inspired by the IPL TUI by [harshiyer.in](https://ipl.harshiyer.in).
+The application runs as an SSH server, allowing anyone to follow the World Cup directly from their terminal without installing any software.
+
+```bash
+ssh worldcup2026.jaredfurtado.tech
+```
 
 ## Features
 
-- **Live Matches**: Keep track of ongoing games, including scorelines, match minutes, and venue.
-- **Match Results (All Matches)**: Interactive table of all matches categorized by status (Live, Upcoming, Completed).
-- **Group Standings**: View real-time group stages standings with stats like Played, Won, Drawn, Lost, Goal Difference, and Points.
-- **Fixtures & Schedule**: Look ahead at upcoming match dates, kickoff times, and host venues.
-- **Historical Winners**: Browse past tournament winners, runners-up, and host nations dating back through World Cup history.
-- **Squads**: Deep dive into team squad details structured by positions (Goalkeepers, Defenders, Midfielders, Forwards) and jersey numbers.
+### Live Matches
 
-## How It Works
+View ongoing World Cup matches with:
 
-The app runs as a standalone SSH server. When a client connects via SSH, the server spawns an interactive Bubble Tea terminal application inside the user's terminal window.
+* Live scores
+* Match status
+* Match minute
+* Stadium information
+* Automatic updates
 
-```
-                  ┌──────────────────────┐
-                  │   World Cup 2026     │
-                  │   TUI SSH Server     │
-                  └──────────▲───────────┘
-                             │ SSH Port 6767
-                             │
-  ┌──────────────────────────┴──────────────────────────┐
-  │                                                     │
-┌─┴───────────────────┐                               ┌─┴───────────────────┐
-│     User Term       │                               │     User Term       │
-│  ssh localhost -p   │                               │  ssh localhost -p   │
-└─────────────────────┘                               └─────────────────────┘
-```
+### Fixtures
 
-## Getting Started
+Browse upcoming matches including:
 
-### Prerequisites
+* Teams
+* Kickoff times
+* Venues
+* Match status
 
-- Go 1.25.2 or later
-- An SSH client (built into Linux/macOS and Windows PowerShell/Command Prompt)
+### Group Standings
 
-### Running Locally
+Follow tournament standings with:
 
-1. **Start the SSH server**:
-   ```bash
-   go run .
-   ```
-   This will start the server on `0.0.0.0:6767` by default.
+* Matches played
+* Wins
+* Draws
+* Losses
+* Goal difference
+* Points
 
-2. **Connect using SSH**:
-   Open a new terminal window and run:
-   ```bash
-   ssh localhost -p 6767
-   ```
+### Historical Winners
 
-### Running with Docker
+Explore previous FIFA World Cup tournaments including:
 
-You can also run the TUI inside a container:
+* Champions
+* Runners-up
+* Host nations
+* Tournament years
+
+### Real Data
+
+The application uses real World Cup data fetched from public ESPN endpoints and cached locally for reliability.
+
+### SSH Access
+
+No installation required.
+
+Simply connect:
 
 ```bash
-docker-compose up --build -d
+ssh worldcup2026.jaredfurtado.tech
 ```
+
+---
+
+## Architecture
+
+The TUI never communicates directly with external APIs.
+
+A background fetcher continuously downloads World Cup data and stores it in local cache files.
+
+```text
+             ESPN API
+                 │
+                 ▼
+         World Cup Fetcher
+                 │
+                 ▼
+         Local JSON Cache
+                 │
+                 ▼
+         World Cup Service
+                 │
+                 ▼
+          Bubble Tea TUI
+                 │
+                 ▼
+            SSH Server
+```
+
+This architecture ensures:
+
+* Fast response times
+* No API calls from the UI
+* Graceful handling of API failures
+* Cached data availability
+
+---
+
+## Project Structure
+
+```text
+cmd/
+├── fetcher/
+
+internal/
+├── espn/
+├── repository/
+├── service/
+├── simulation/
+
+cache/
+├── live_matches.json
+├── fixtures.json
+├── standings.json
+
+data/
+logs/
+```
+
+---
+
+## Running Locally
+
+### Start the Fetcher
+
+```bash
+go run ./cmd/fetcher
+```
+
+This downloads and updates:
+
+```text
+cache/live_matches.json
+cache/fixtures.json
+cache/standings.json
+```
+
+### Start the SSH Server
+
+```bash
+go run .
+```
+
+Connect from another terminal:
+
+```bash
+ssh localhost -p 6767
+```
+
+---
+
+## Deployment
+
+The production version runs on an Ubuntu VPS using systemd.
+
+Services:
+
+```bash
+worldcup.service
+worldcup-fetcher.service
+```
+
+The fetcher continuously refreshes World Cup data while the SSH server serves terminal sessions.
+
+---
 
 ## Keyboard Shortcuts
 
-Navigate through the screens using the keyboard:
+| Key | Action             |
+| --- | ------------------ |
+| l   | Live Matches       |
+| m   | Matches            |
+| p   | Standings          |
+| s   | Schedule           |
+| h   | Historical Winners |
+| a   | About              |
+| q   | Quit               |
 
-- `l` - Go to **Live View**
-- `m` - Go to **Matches**
-- `p` - Go to **Standings (Points Table)**
-- `s` - Go to **Schedule**
-- `h` - Go to **Historical Winners**
-- `a` - Go to **About**
-- `q` / `Ctrl+C` - Quit the application
+Navigation:
 
-In the tab sidebar navigation view:
-- `↑` / `↓` - Move cursor selection
-- `→` / `Enter` - Select and enter the view
-- `←` - Return focus to the sidebar navigation
+| Key       | Action |
+| --------- | ------ |
+| ↑ / ↓     | Move   |
+| Enter / → | Select |
+| ←         | Back   |
 
-## Configuration
-
-You can configure the base URL for the live matches API via the `.env` file:
-
-```env
-API_URL=http://localhost:8080
-```
+---
 
 ## Tech Stack
 
-- **[Bubble Tea](https://github.com/charmbracelet/bubbletea)** - TUI framework
-- **[Lip Gloss](https://github.com/charmbracelet/lipgloss)** - Style definitions and layouts
-- **[Wish](https://github.com/charmbracelet/wish)** - SSH server library
-- **[Bubbles](https://github.com/charmbracelet/bubbles)** - Interactive components (tables)
+* Go
+* Bubble Tea
+* Lip Gloss
+* Wish
+* Bubbles
+* Systemd
+* Ubuntu VPS
+* ESPN Public JSON Endpoints
+
+---
+
+## Inspiration
+
+Inspired by the IPL TUI project by Harsh Iyer.
+
+---
+
+## Try It
+
+```bash
+ssh worldcup2026.jaredfurtado.tech
+```
+
+No installation required.
